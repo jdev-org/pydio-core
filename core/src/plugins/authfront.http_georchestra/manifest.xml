@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="authfront.http_georchestra" enabled="true" label="CONF_MESSAGE[geOrchestra authentication]" description="CONF_MESSAGE[Auth performed by geOrchestra security-proxy]"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<class_definition filename="plugins/authfront.http_georchestra/GeorchestraHttpAuthFrontend.php" classname="Pydio\Auth\Frontend\GeorchestraHttpAuthFrontend"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="authfront.http_georchestra" path="plugins/authfront.http_georchestra/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="CREATE_USER" type="boolean" label="CONF_MESSAGE[Create User]" description="CONF_MESSAGE[Automatically create user if it does not already exists]" default="true"/>
+        <global_param name="AJXP_ADMIN" type="string" label="CONF_MESSAGE[Admin login]" description="CONF_MESSAGE[Automatically set this login as pydio administrator]"/>
+        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="1"/>
+        <global_param name="GEOR_CASCASDING_PROXY" group="CONF_MESSAGE[Proxy information]" type="boolean" label="CONF_MESSAGE[Is Pydio instalr behind several securty-proxy (ex intranet + extranet)]" description="CONF_MESSAGE[Cascading security-proxy]" mandatory="true" />
+  		<global_param name="GEOR_HTTP_FORW_FOR" group="CONF_MESSAGE[Proxy information]" type="string" label="CONF_MESSAGE[Value of X-Forwarded-Server for extranet]" description="CONF_MESSAGE[X-Forwarded-Server]" mandatory="false" />
+ 		<global_param name="GEOR_HTTP_FORW_HOST" group="CONF_MESSAGE[Proxy information]" type="string" label="CONF_MESSAGE[Value of X-Forwarded-For for extranet]" description="CONF_MESSAGE[X-Forwarded-For]" mandatory="false" />
+ 		<global_param name="GEOR_EXTRANET_PREFIX" group="CONF_MESSAGE[Proxy information]" type="string" label="CONF_MESSAGE[Value of extranet prefix for example e_]" description="CONF_MESSAGE[Extranet prefix]" mandatory="false" />
+     </server_settings>
+</ajxpcore>
