@@ -10,6 +10,6 @@ $mess=array(
 "Is Pydio instalr behind several securty-proxy (ex intranet + extranet)" => "Est-ce Pydio est installer derrière plus d'un security-proxy",
 "Order this plugin with other auth frontends" => "Ordre de ce pluggin par rapport aux autres systèmes d'authentification",
 "Value of X-Forwarded-Server for extranet" => "Valeur du header X-Forwarded-Server pour l'extranet",
-"Value of X-Forwarded-For for extranet" => "Valeur du header X-Forwarded-For pour l'extranet",
+"Value of X-Forwarded-For for extranet" => "Valeur du header X-Forwarded-For pour l'extranet, peut contenir plusieurs IPS séparées par un virgule",
 "Value of extranet prefix for example e_" => "Valeur du prefix pour le nom de l'utilisateur extranet par exemple e_",
 );

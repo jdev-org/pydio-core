@@ -49,14 +49,16 @@ class GeorchestraHttpAuthFrontend extends AbstractAuthFrontend
     {
 	
 	// get headers informations
-	$headers = apache_request_headers();
+	$headers = array_change_key_case(apache_request_headers(), CASE_LOWER);
 	if (!isSet($headers['sec-username'])) return false;
         
 	$username = $headers['sec-username'];
+	
 	// Create new username if extranet user
 	if ($this->pluginConf["GEOR_CASCADING_PROXY"] == 1 
+			&& isset($headers['x-forwarded-server']) && isset($headers['x-forwarded-for'])
         	&& $this->pluginConf["GEOR_HTTP_FORW_SERVER"] === $headers['x-forwarded-server'] 
-           	 && $this->pluginConf["GEOR_HTTP_FORW_FOR"] === $headers['x-forwarded-for']) { 
+           	&& strpos($this->pluginConf["GEOR_HTTP_FORW_FOR"], $headers['x-forwarded-for']) != false) { 
                 $username = $this->pluginConf["GEOR_EXTRANET_PREFIX"] . $headers['sec-username'];
         }
 	$generatedPassw = md5(microtime(true));
