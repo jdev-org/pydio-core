@@ -48,33 +48,37 @@ class GeorchestraHttpAuthFrontend extends AbstractAuthFrontend
     function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false)
     {
 	
-	// get headers informations
-	$headers = array_change_key_case(apache_request_headers(), CASE_LOWER);
-	if (!isSet($headers['sec-username'])) return false;
-        
-	$username = $headers['sec-username'];
+		// get headers informations
+		$headers = array_change_key_case(apache_request_headers(), CASE_LOWER);
+		
+		if (!isset($headers['sec-username'])){
+			return false;
+		}
+	        
+		$username = $headers['sec-username'];
+		
+		// Create new username if extranet user
+		if ($this->pluginConf["GEOR_CASCADING_PROXY"] == 1 
+				&& isset($headers['x-forwarded-server']) && isset($headers['x-forwarded-for'])
+	        	&& $this->pluginConf["GEOR_HTTP_FORW_SERVER"] === $headers['x-forwarded-server'] 
+	           	&& strpos($this->pluginConf["GEOR_HTTP_FORW_FOR"], $headers['x-forwarded-for']) != false) { 
+	                $username = $this->pluginConf["GEOR_EXTRANET_PREFIX"] . $headers['sec-username'];
+	    }
+		$generatedPassw = md5(microtime(true));
+	       
 	
-	// Create new username if extranet user
-	if ($this->pluginConf["GEOR_CASCADING_PROXY"] == 1 
-			&& isset($headers['x-forwarded-server']) && isset($headers['x-forwarded-for'])
-        	&& $this->pluginConf["GEOR_HTTP_FORW_SERVER"] === $headers['x-forwarded-server'] 
-           	&& strpos($this->pluginConf["GEOR_HTTP_FORW_FOR"], $headers['x-forwarded-for']) != false) { 
-                $username = $this->pluginConf["GEOR_EXTRANET_PREFIX"] . $headers['sec-username'];
-        }
-	$generatedPassw = md5(microtime(true));
-       
-
-        if (!UsersService::userExists($username) && $this->pluginConf["CREATE_USER"] === true) {
-            UsersService::createUser($username, $generatedPassw, (isset($this->pluginConf["AJXP_ADMIN"]) && $this->pluginConf["AJXP_ADMIN"] == $username));
-        }
-        try {
-            $logged = AuthService::logUser($username, "", true);
-            $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
-            return true;
-        } catch (\Pydio\Core\Exception\LoginException $l) {
-        }
-        return false;
-
-    }
+	    if (!UsersService::userExists($username) && $this->pluginConf["CREATE_USER"] === true) {
+	        UsersService::createUser($username, $generatedPassw, (isset($this->pluginConf["AJXP_ADMIN"]) && $this->pluginConf["AJXP_ADMIN"] == $username));
+	    }
+	    
+	    try {
+	        $logged = AuthService::logUser($username, "", true);
+	        $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
+	        return true;
+	    } catch (\Pydio\Core\Exception\LoginException $l) {
+	    
+	    }
+	    return false;
+	}
 
 } 
