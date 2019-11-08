@@ -58,14 +58,28 @@ class GeorchestraHttpAuthFrontend extends AbstractAuthFrontend
 		$username = $headers['sec-username'];
 		
 		// Create new username if extranet user
-		if ($this->pluginConf["GEOR_CASCADING_PROXY"] == 1 
+        if ($this->pluginConf["GEOR_CASCADING_PROXY"] == 1 
 				&& isset($headers['x-forwarded-server']) && isset($headers['x-forwarded-for'])
-	        	&& $this->pluginConf["GEOR_HTTP_FORW_SERVER"] === $headers['x-forwarded-server'] 
-	           	&& strpos($this->pluginConf["GEOR_HTTP_FORW_FOR"], $headers['x-forwarded-for']) != false) { 
-	                $username = $this->pluginConf["GEOR_EXTRANET_PREFIX"] . $headers['sec-username'];
-	    }
-		$generatedPassw = md5(microtime(true));
-	       
+	        	&& $this->pluginConf["GEOR_HTTP_FORW_SERVER"] === $headers['x-forwarded-server']  ){
+        	
+        	$ipList = explode(",", $this->pluginConf["GEOR_HTTP_FORW_FOR"]);
+        	
+        	$isConnectedExtranet = false;
+        	// Each ip must be in the list
+        	foreach ($ipList as $ip){     	
+           		if (strpos($headers['x-forwarded-for'], $ip) !== false ) {  
+               		// Ip adresse is in the list
+               		$isConnectedExtranet = true;
+                }else{
+                	$isConnectedExtranet = false;
+                	break;
+                }
+             }
+             if ($isConnectedExtranet){
+             	$username = this->pluginConf["GEOR_EXTRANET_PREFIX"] . $headers['sec-username'];
+             }
+        }
+        $generatedPassw = md5(microtime(true));
 	
 	    if (!UsersService::userExists($username) && $this->pluginConf["CREATE_USER"] === true) {
 	        UsersService::createUser($username, $generatedPassw, (isset($this->pluginConf["AJXP_ADMIN"]) && $this->pluginConf["AJXP_ADMIN"] == $username));
